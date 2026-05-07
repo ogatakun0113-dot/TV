@@ -2,10 +2,7 @@ import streamlit as st
 from datetime import datetime
 
 # ページ設定
-st.set_page_config(page_title="緒方専用・番組ハブ", layout="wide")
-
-# 現在の日付を「YYYYMMDD」形式で自動取得
-today_str = datetime.now().strftime("%Y%m%d")
+st.set_page_config(page_title="個人用番組表", layout="wide")
 
 # カスタムCSS
 st.markdown("""
@@ -14,73 +11,65 @@ st.markdown("""
     background-color: #005A9C; 
     color: white !important; 
     padding: 20px; 
-    border-radius: 12px; 
+    border-radius: 10px; 
     text-align: center; 
     text-decoration: none; 
     display: block; 
     font-size: 20px; 
     font-weight: bold;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
-.channel-card { 
-    background-color: #f8f9fa; 
-    padding: 15px; 
-    border-radius: 10px; 
-    border-left: 6px solid #FF8C00; 
-    margin-bottom: 15px; 
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
-}
-.channel-card a { text-decoration: none; color: #005A9C; font-weight: bold; font-size: 16px; }
-.channel-card a:hover { color: #ff4b4b; }
+.channel-card { background-color: #f8f9fa; padding: 15px; border-radius: 10px; border-left: 5px solid #FF8C00; margin-bottom: 15px; }
+.channel-card a { text-decoration: none; color: #005A9C; font-weight: bold; }
 </style>
 """, unsafe_allow_html=True)
 
 st.markdown('<p style="text-align: right; font-size: 12px; color: #666;">開発/制作：緒方</p>', unsafe_allow_html=True)
-st.title("📺 緒方専用・日付自動連動番組表")
-st.write(f"📅 本日の番組表日付: **{datetime.now().strftime('%Y年%m月%d日')}**")
+st.title("📺 個人用テレビ番組情報ハブ")
 
-# --- 1. CS番組表へ直行 (緒方さん提案のURL形式) ---
-# 日付パラメータを自動計算して埋め込み
-cs_direct_url = f"https://bangumi.org/epg/cs?broad_cast_date={today_str}"
-st.markdown(f'<a href="{cs_direct_url}" target="_blank" class="main-link">➔ 本日のCS番組表（グリッド表示）を直接開く</a>', unsafe_allow_html=True)
+# 最も確実な「番組表ページ」へのボタン
+st.markdown('<a href="https://bangumi.org/tfb/area_codes" target="_blank" class="main-link">➔ 全体の番組表を開く（Gガイド）</a>', unsafe_allow_html=True)
 
-# --- 2. タブエリア（地上波・BSも同様の仕組みで作成） ---
-tab1, tab2 = st.tabs(["📡 地上波・BS (本日分)", "🎬 専門チャンネル個別"])
+st.info("💡 上のボタンから「大阪」や「BS/CS」を選択すると確実に表示されます。")
 
-with tab1:
-    st.subheader("地上波・BS（ダイレクト表示）")
-    col1, col2 = st.columns(2)
-    with col1:
-        # 地上波(大阪:27)の直行URL
-        gs_url = f"https://bangumi.org/epg/td?area_code=27&broad_cast_date={today_str}"
-        st.markdown(f'<div class="channel-card"><strong>大阪・地上波</strong><br><a href="{gs_url}" target="_blank">➔ 本日の地上波番組表へ</a></div>', unsafe_allow_html=True)
-    with col2:
-        # BSの直行URL
-        bs_url = f"https://bangumi.org/epg/bs?broad_cast_date={today_str}"
-        st.markdown(f'<div class="channel-card"><strong>BSデジタル</strong><br><a href="{bs_url}" target="_blank">➔ 本日のBS番組表へ</a></div>', unsafe_allow_html=True)
+# --- タブの作成 ---
+category = st.tabs(["📡 地上波 (大阪)", "🛰️ BSデジタル", "🎬 CS (専門ch)"])
 
-with tab2:
-    st.subheader("CS 注目局スケジュール")
-    st.write("※各局の放送予定をピンポイントで確認できます。")
-    cs_list = [
-        ("310 スーパー!ドラマTV", "スーパー!ドラマTV"),
-        ("340 ディスカバリー", "ディスカバリーチャンネル"),
-        ("342 ヒストリーch", "ヒストリーチャンネル"),
-        ("343 ナシジオ", "ナショナル+ジオグラフィック"),
-        ("349 日テレNEWS24", "日テレNEWS24")
+with category[0]:
+    st.subheader("大阪エリアの放送局")
+    st.write("各局の検索結果（放送予定）へリンクします。")
+    ch_list = ["NHK総合", "MBS毎日放送", "ABCテレビ", "テレビ大阪", "関西テレビ", "読売テレビ"]
+    cols = st.columns(3)
+    for i, name in enumerate(ch_list):
+        with cols[i % 3]:
+            url = f"https://bangumi.org/tfb/search?q={name}"
+            st.markdown(f'<div class="channel-card"><p>{name}</p><a href="{url}" target="_blank">番組一覧を確認</a></div>', unsafe_allow_html=True)
+
+with category[1]:
+    st.subheader("BS放送")
+    st.markdown('<a href="https://bangumi.org/tfb/area_codes/bs" target="_blank">👉 BSの番組一覧へ</a>', unsafe_allow_html=True)
+
+with category[2]:
+    st.subheader("緒方さんお気に入りCS局")
+    # 検索画面であればFile Not Foundになりにくいので、検索結果へ誘導します
+    cs_channels = [
+        {"CH": "310", "局名": "スーパー! ドラマTV", "KW": "スーパー!ドラマTV"},
+        {"CH": "340", "局名": "ディスカバリーチャンネル", "KW": "ディスカバリー"},
+        {"CH": "342", "局名": "ヒストリーチャンネル", "KW": "ヒストリーチャンネル"},
+        {"CH": "343", "局名": "ナショナル ジオグラフィック", "KW": "ナショナル+ジオグラフィック"},
+        {"CH": "349", "局名": "日テレNEWS24", "KW": "日テレNEWS24"},
     ]
-    
-    cols = st.columns(2)
-    for i, (ch_name, kw) in enumerate(cs_list):
-        with cols[i % 2]:
-            search_url = f"https://bangumi.org/tfb/search?q={kw}"
+    cs_cols = st.columns(2)
+    for j, cs in enumerate(cs_channels):
+        with cs_cols[j % 2]:
+            search_url = f"https://bangumi.org/tfb/search?q={cs['KW']}"
             st.markdown(f"""
             <div class="channel-card">
-                <p style="margin:0;"><strong>{ch_name}</strong></p>
+                <h4 style="margin:0;">{cs['CH']}ch</h4>
+                <p><strong>{cs['局名']}</strong></p>
                 <a href="{search_url}" target="_blank">🔍 放送予定を表示</a>
             </div>
             """, unsafe_allow_html=True)
 
 st.markdown("---")
-st.info("💡 日付は自動更新されます。もし古い日付が出る場合はアプリを再読み込み（リロード）してください。")
+st.caption("※Gガイドの仕様により、直接表示されない場合はトップページから「地域」を選び直してください。")
