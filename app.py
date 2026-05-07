@@ -42,7 +42,7 @@ st.write("")
 # --- 各種番組表へのダイレクトボタン ---
 
 # 1. 地デジ (大阪: ggm_group_id=42)
-td_url = f"https://bangumi.org/epg/td?broad_cast_date={date_param}&ggm_group_id=42"
+td_url = f"https://bangumi.org/epg/td?broad_cast_date={date_param}&ggm_group_id=84"
 st.markdown(f'<a href="{td_url}" target="_blank" class="main-btn">📡 {display_date} の地デジ（大阪）</a>', unsafe_allow_html=True)
 
 # 2. BS放送
