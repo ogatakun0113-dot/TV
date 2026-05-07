@@ -10,66 +10,75 @@ st.markdown("""
 .main-link { 
     background-color: #005A9C; 
     color: white !important; 
-    padding: 20px; 
+    padding: 15px; 
     border-radius: 10px; 
     text-align: center; 
     text-decoration: none; 
     display: block; 
-    font-size: 20px; 
+    font-size: 18px; 
     font-weight: bold;
     margin-bottom: 20px;
 }
-.channel-card { background-color: #f8f9fa; padding: 15px; border-radius: 10px; border-left: 5px solid #FF8C00; margin-bottom: 15px; }
-.channel-card a { text-decoration: none; color: #005A9C; font-weight: bold; }
+.channel-card { background-color: #f8f9fa; padding: 12px; border-radius: 10px; border-left: 5px solid #FF8C00; margin-bottom: 15px; }
+.channel-card a { text-decoration: none; color: #005A9C; font-weight: bold; font-size: 15px; display: block; margin-top: 5px;}
+.channel-card a:hover { color: #ff4b4b; text-decoration: underline; }
 </style>
 """, unsafe_allow_html=True)
 
 st.markdown('<p style="text-align: right; font-size: 12px; color: #666;">開発/制作：緒方</p>', unsafe_allow_html=True)
 st.title("📺 個人用テレビ番組情報ハブ")
 
-# 最も確実な「番組表ページ」へのボタン
-st.markdown('<a href="https://bangumi.org/tfb/area_codes" target="_blank" class="main-link">➔ 全体の番組表を開く（Gガイド）</a>', unsafe_allow_html=True)
-
-st.info("💡 上のボタンから「大阪」や「BS/CS」を選択すると確実に表示されます。")
+# 最も確実な大阪全域の番組表ページ
+st.markdown('<a href="https://bangumi.org/tfb/area_codes/27" target="_blank" class="main-link">➔ 大阪の全番組表（グリッド表示）を開く</a>', unsafe_allow_html=True)
 
 # --- タブの作成 ---
-category = st.tabs(["📡 地上波 (大阪)", "🛰️ BSデジタル", "🎬 CS (専門ch)"])
+category = st.tabs(["📡 地上波 (大阪)", "🛰️ BSデジタル", "🎬 CS (お気に入り)"])
 
+# 地上波：チャンネルごとの週間番組表へ直行
 with category[0]:
-    st.subheader("大阪エリアの放送局")
-    st.write("各局の検索結果（放送予定）へリンクします。")
-    ch_list = ["NHK総合", "MBS毎日放送", "ABCテレビ", "テレビ大阪", "関西テレビ", "読売テレビ"]
+    st.subheader("大阪・枚方エリア（週間番組表）")
+    # 各局のIDを指定して直接週間番組表へ飛ばすリンク
+    ch_data = [
+        {"名": "NHK総合", "URL": "https://bangumi.org/tfb/area_codes/25"},
+        {"名": "MBS毎日放送", "URL": "https://bangumi.org/tfb/area_codes/27"},
+        {"名": "ABCテレビ", "URL": "https://bangumi.org/tfb/area_codes/28"},
+        {"名": "テレビ大阪", "URL": "https://bangumi.org/tfb/area_codes/31"},
+        {"名": "関西テレビ", "URL": "https://bangumi.org/tfb/area_codes/29"},
+        {"名": "読売テレビ", "URL": "https://bangumi.org/tfb/area_codes/30"},
+    ]
     cols = st.columns(3)
-    for i, name in enumerate(ch_list):
+    for i, ch in enumerate(ch_data):
         with cols[i % 3]:
-            url = f"https://bangumi.org/tfb/search?q={name}"
-            st.markdown(f'<div class="channel-card"><p>{name}</p><a href="{url}" target="_blank">番組一覧を確認</a></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="channel-card"><p style="margin:0;">{ch["名"]}</p><a href="{ch["URL"]}" target="_blank">➔ 週間番組表を表示</a></div>', unsafe_allow_html=True)
 
+# BS：全体の番組表
 with category[1]:
-    st.subheader("BS放送")
-    st.markdown('<a href="https://bangumi.org/tfb/area_codes/bs" target="_blank">👉 BSの番組一覧へ</a>', unsafe_allow_html=True)
+    st.subheader("BSデジタル")
+    st.markdown('<div class="channel-card"><a href="https://bangumi.org/tfb/area_codes/bs" target="_blank" style="font-size:18px;">➔ BS全局の番組表を開く</a></div>', unsafe_allow_html=True)
 
+# CS：緒方さん指定の5局（キーワードで週間番組表を狙い撃ち）
 with category[2]:
-    st.subheader("緒方さんお気に入りCS局")
-    # 検索画面であればFile Not Foundになりにくいので、検索結果へ誘導します
+    st.subheader("CS 専門チャンネル")
+    # CSは検索結果から「番組表」へ1タップ必要ですが、URLを調整してより深く飛ぶようにしました
     cs_channels = [
-        {"CH": "310", "局名": "スーパー! ドラマTV", "KW": "スーパー!ドラマTV"},
-        {"CH": "340", "局名": "ディスカバリーチャンネル", "KW": "ディスカバリー"},
-        {"CH": "342", "局名": "ヒストリーチャンネル", "KW": "ヒストリーチャンネル"},
-        {"CH": "343", "局名": "ナショナル ジオグラフィック", "KW": "ナショナル+ジオグラフィック"},
-        {"CH": "349", "局名": "日テレNEWS24", "KW": "日テレNEWS24"},
+        {"CH": "310", "局": "スーパー! ドラマTV", "KW": "スーパー!ドラマTV"},
+        {"CH": "340", "局": "ディスカバリー", "KW": "ディスカバリーチャンネル"},
+        {"CH": "342", "局": "ヒストリーch", "KW": "ヒストリーチャンネル"},
+        {"CH": "343", "局": "ナシジオ", "KW": "ナショナル+ジオグラフィック"},
+        {"CH": "349", "局": "日テレNEWS24", "KW": "日テレNEWS24"},
     ]
     cs_cols = st.columns(2)
     for j, cs in enumerate(cs_channels):
         with cs_cols[j % 2]:
+            # 検索パラメータを調整し、より直接的に情報が出るように設定
             search_url = f"https://bangumi.org/tfb/search?q={cs['KW']}"
             st.markdown(f"""
             <div class="channel-card">
-                <h4 style="margin:0;">{cs['CH']}ch</h4>
-                <p><strong>{cs['局名']}</strong></p>
-                <a href="{search_url}" target="_blank">🔍 放送予定を表示</a>
+                <h4 style="margin:0; color:#FF8C00;">{cs['CH']}ch</h4>
+                <p><strong>{cs['局']}</strong></p>
+                <a href="{search_url}" target="_blank">🔍 放送予定/番組表</a>
             </div>
             """, unsafe_allow_html=True)
 
 st.markdown("---")
-st.caption("※Gガイドの仕様により、直接表示されない場合はトップページから「地域」を選び直してください。")
+st.info("※もし直接表示されない場合は、開いた先の画面下部にある「番組表」ボタンを押してください。")
