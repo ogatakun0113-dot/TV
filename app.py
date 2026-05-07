@@ -25,7 +25,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown('<p style="text-align: right; font-size: 12px; color: #666;">開発/制作：緒方</p>', unsafe_allow_html=True)
-st.title("📺 TV番組表")
+st.title("📺 ＴＶ番組表")
 
 # --- カレンダー設置エリア ---
 st.info("📅 見たい日付を下のカレンダーから選んでください")
